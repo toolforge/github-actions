@@ -14,18 +14,15 @@ on:
 
 jobs:
   build_and_push:
+    # Pull requests from forks get no secrets; push the branch to the
+    # repository itself to build its images.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-
-      - name: git fetch
-        run: |
-          git fetch
-      - name: git checkout
-        run: |
-          git checkout ${{ github.head_ref }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
